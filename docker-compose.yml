@@ -1,0 +1,54 @@
+version: "3"
+
+services:
+
+  database-mysql-movie:
+    image: mysql:9.1.0
+    container_name: database-mysql-movie
+    env_file:
+      - .env
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "3307:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - cinemusic-microservices-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      interval: 10s
+      retries: 3
+
+  microservice-movie:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: microservice-movie
+    image: microservice-movie:v1.0.0
+    env_file:
+      - .env
+    ports:
+      - "2001:2001"
+    volumes:
+      - ./app:/microservice-movie/app
+      - ./main.py:/microservice-movie/main.py
+      - ./requirements.txt:/microservice-movie/requirements.txt
+    networks:
+      - cinemusic-microservices-network
+    depends_on:
+      database-mysql-movie:
+        condition: service_healthy
+    restart: unless-stopped
+
+networks:
+  cinemusic-microservices-network:
+    driver: bridge
+
+volumes:
+  db-data:
