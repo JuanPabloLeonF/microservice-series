@@ -31,6 +31,5 @@ class SeasonEntity(DatabaseConfiguration.BaseModels):
             'name': self.name,
             'dateCreation': self.dateCreation,
             'seriesId': self.seriesId,
-            'quantityChapters': self.quantityChapters,
             'chapters': [ chapter.getJson() for chapter in self.chapters ]
         }

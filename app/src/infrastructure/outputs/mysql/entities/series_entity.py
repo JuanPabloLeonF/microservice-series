@@ -33,7 +33,7 @@ class SeriesEntity(DatabaseConfiguration.BaseModels):
         self.dateCreation: str = dateCreation
         self.category: list[str] = category
         self.rating: str = rating
-        self.seasons: seasons
+        self.seasons: list[SeasonEntity] = seasons
 
     def getJSON(self) -> dict:
         return {

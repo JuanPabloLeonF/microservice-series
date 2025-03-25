@@ -4,7 +4,6 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from app.src.application.utils.utils_file_application import UtilsFilesApplication
 from app.src.infrastructure.outputs.mysql.entities.series_entity import SeriesEntity
 from app.src.infrastructure.outputs.mysql.settings.database_config import DatabaseConfiguration
-from app.src.infrastructure.outputs.mysql.entities.season_entity import SeasonEntity
 from app.src.infrastructure.outputs.mysql.repositories.i_series_entity import ISeriesEntity
 
 class ImplementationSEriesEntity(ISeriesEntity):
@@ -29,6 +28,7 @@ class ImplementationSEriesEntity(ISeriesEntity):
     async def create(self, series: SeriesEntity) -> SeriesEntity:
         async with DatabaseConfiguration.getSession() as session:
             try:
+                series.imgUrl = "files/series/id"
                 session.add(series)
                 await session.commit()
                 await session.refresh(series)
@@ -47,6 +47,7 @@ class ImplementationSEriesEntity(ISeriesEntity):
                 if result is None:
                     UtilsFilesApplication.deletedFile(filePath=seriesUpdate.imgUrl)
                     raise ValueError(f"la serie no fue encontrada por el id: {id}")
+
                 UtilsFilesApplication.deletedFile(filePath=result.imgUrl)
                 result.name = seriesUpdate.name
                 result.description = seriesUpdate.description
@@ -70,16 +71,8 @@ class ImplementationSEriesEntity(ISeriesEntity):
                 result: SeriesEntity | None = await session.get(SeriesEntity, id)
                 if result is None:
                     raise ValueError(f"la serie no fue encontrada por el id: {id}")
-                UtilsFilesApplication.deletedFile(filePath=result.imgUrl)
 
-
-                """
-                UtilsFilesApplication.deleteDirectoryFull(folderName=url de la carpeta)
-                ahi que hacer implementacion en la cual se elimine la carpeta completa
-                en donde se alojan todo lo relacionado con las imagenes y videos de los
-                los capitulos al igual que la imagen de la serie
-                """
-
+                UtilsFilesApplication.deleteDirectoryFull(folderName=f"files/series/{id}")
                 await session.delete(result)
                 await session.commit()
                 return "serie eliminada"
