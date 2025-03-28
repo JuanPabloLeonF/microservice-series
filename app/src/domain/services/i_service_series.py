@@ -21,5 +21,9 @@ class ISeriesService(ABC):
         pass
 
     @abstractmethod
+    async def updateByIdTheImgUrl(self, imgUrl: str, id: str) -> str:
+        pass
+
+    @abstractmethod
     async def deleteById(self, id: str) -> str:
         pass

@@ -1,4 +1,5 @@
 import os
+import shutil
 import uuid
 from fastapi import UploadFile
 from app.configuration.enviroments_config import ALLOW_EXTENSIONS_FILE_IMG, ALLOW_EXTENSIONS_FILE_VIDEO, MAX_SIZE_IMG_FILE_MB, MAX_SIZE_VIDEO_FILE_MB
@@ -46,7 +47,7 @@ class UtilsFilesApplication:
     @staticmethod
     def deleteDirectoryFull(folderName: str) -> None:
         if os.path.exists(folderName):
-            os.rmdir(folderName)
+            shutil.rmtree(folderName)
 
     @staticmethod
     def saveFile(file: UploadFile, folderName: str) -> str:

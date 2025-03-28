@@ -1,12 +1,12 @@
 from app.src.domain.models.model_series import SeriesModel
 from app.src.domain.persistence.i_persistence_series import ISeriesPersistence
-from app.src.infrastructure.outputs.mysql.repositories.i_series_entity import ISeriesEntity
+from app.src.infrastructure.outputs.mysql.repositories.i_series_repository import ISeriesRepository
 from app.src.infrastructure.outputs.mysql.mappers.i_mapper_series_entity import IMapperSeriesEntity
 
 class AdapterSeries(ISeriesPersistence):
 
-    def __init__(self, iSeriesEntity:ISeriesEntity, iMapperSeriesEntity:IMapperSeriesEntity):
-        self.iSeriesEntity: ISeriesEntity = iSeriesEntity
+    def __init__(self, iSeriesEntity:ISeriesRepository, iMapperSeriesEntity:IMapperSeriesEntity):
+        self.iSeriesEntity: ISeriesRepository = iSeriesEntity
         self.iMapperSeriesEntity: IMapperSeriesEntity = iMapperSeriesEntity
 
     async def getAll(self, page: int, limit: int) -> list[SeriesModel]:
@@ -27,6 +27,9 @@ class AdapterSeries(ISeriesPersistence):
                 )
             )
         )
+
+    async def updateByIdTheImgUrl(self, imgUrl: str, id: str) -> str:
+        return await self.iSeriesEntity.updateByIdTheImgUrl(imgUrl=imgUrl, id=id)
 
     async def updateById(self, id: str, seriesUpdate: SeriesModel) -> SeriesModel:
         return self.iMapperSeriesEntity.mapperSeriesEntityToSeriesModel(

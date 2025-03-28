@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from app.src.infrastructure.outputs.mysql.entities.series_entity import SeriesEntity
 
-class ISeriesEntity(ABC):
+class ISeriesRepository(ABC):
 
     @abstractmethod
     async def getAll(self, page:int, limit:int) -> list[SeriesEntity]:
@@ -17,6 +17,10 @@ class ISeriesEntity(ABC):
 
     @abstractmethod
     async def updateById(self, id: str, seriesUpdate: SeriesEntity) -> SeriesEntity:
+        pass
+
+    @abstractmethod
+    async def updateByIdTheImgUrl(self, imgUrl: str, id: str) -> str:
         pass
 
     @abstractmethod

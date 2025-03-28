@@ -13,34 +13,49 @@ class ImplementationHandlerSeries(IHandlerSeries):
         self.iSeriesService: ISeriesService = iSeriesService
 
     async def getAll(self, page: int, limit: int) -> list[ResponseSeries]:
-        return self.iMapperSeriesApplication.mapperSeriesModelListToResponseSeriesList(
+        responseSeriesList: list[ResponseSeries] = self.iMapperSeriesApplication.mapperSeriesModelListToResponseSeriesList(
             seriesModelList= await self.iSeriesService.getAll(page=page, limit=limit)
         )
+        return [ response.getJSON() for response in responseSeriesList]
 
     async def getById(self, id: str) -> ResponseSeries:
-        return self.iMapperSeriesApplication.mapperSeriesModelToResponseSeries(
+        responseSeries: ResponseSeries = self.iMapperSeriesApplication.mapperSeriesModelToResponseSeries(
             seriesModel= await self.iSeriesService.getById(id=id)
         )
+        return responseSeries.getJSON()
 
     async def create(self, series: RequestSeries) -> ResponseSeries:
-        imgUrl: str = UtilsFilesApplication.saveFile(file=series.imgFile, folderName="series")
         seriesModel: SeriesModel = self.iMapperSeriesApplication.mapperRequestSeriesToSeriesModel(
-            imgUrl=imgUrl,
+            imgUrl="files/series/id",
             requestSeries=series
         )
         responseSeries: ResponseSeries = self.iMapperSeriesApplication.mapperSeriesModelToResponseSeries(
             seriesModel= await self.iSeriesService.create(series=seriesModel)
         )
 
-        """
-        AQUI AHI QUE CREAR UNA IMPLEMENTACION EN LA CUAL DETECTE SI TODO DALIO BIEJ DEVUELVE EL JSON,
-        PERO SI ALGO SALIO MAL ELIMINAR LA IMAGEN DEL DIRECTORIO.
-        """
+        imgUrl: str = UtilsFilesApplication.saveFile(file=series.imgFile, folderName=responseSeries.imgUrl)
 
+        await self.iSeriesService.updateByIdTheImgUrl(imgUrl=imgUrl, id=responseSeries.id)
+
+        responseSeries.imgUrl = imgUrl
         return responseSeries.getJSON()
 
     async def updateById(self, id: str, seriesUpdate: RequestSeries) -> ResponseSeries:
-        pass
+
+        await self.iSeriesService.getById(id=id)
+
+        imgUrl: str = UtilsFilesApplication.saveFile(file=seriesUpdate.imgFile, folderName=f"files/series/{id}")
+
+        seriesModel: SeriesModel = self.iMapperSeriesApplication.mapperRequestSeriesToSeriesModel(
+            imgUrl=imgUrl,
+            requestSeries=seriesUpdate
+        )
+
+        responseSeries: ResponseSeries = self.iMapperSeriesApplication.mapperSeriesModelToResponseSeries(
+            seriesModel= await self.iSeriesService.updateById(id=id,seriesUpdate=seriesModel)
+        )
+
+        return responseSeries.getJSON()
 
     async def deleteById(self, id: str) -> str:
-        pass
+        return await self.iSeriesService.deleteById(id=id)

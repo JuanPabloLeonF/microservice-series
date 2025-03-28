@@ -1,42 +1,42 @@
 from injector import singleton, provider, Module
 
-from app.src.application.handlers.i_handler_movie import IHandlerMovie
-from app.src.application.handlers.implementation_handler_movie import ImplementationHandlerMovie
-from app.src.application.mappers.i_mapper_handler import IMapperHandler
-from app.src.domain.persistence.i_persistence_movie import IPersistenceMovie
-from app.src.domain.services.i_service_movie import IServiceMovie
-from app.src.domain.useCases.use_case_movie import UseCaseMovie
-from app.src.infrastructure.outputs.mysql.adapters.adapter_movie import AdapterMovie
-from app.src.infrastructure.outputs.mysql.mappers.i_mapper_entity_movie import IMapperEntityMovie
-from app.src.infrastructure.outputs.mysql.repositories.i_repository_movie import IRepositoryMovie
-from app.src.infrastructure.outputs.mysql.repositories.implementation_repository_movie import \
-    ImplementationMovieRepository
+from app.src.application.handlers.i_handler_series import IHandlerSeries
+from app.src.application.handlers.implementation_handler_series import ImplementationHandlerSeries
+from app.src.application.mappers.i_mapper_series_appliaction import IMapperSeriesApplication
+from app.src.domain.persistence.i_persistence_series import ISeriesPersistence
+from app.src.domain.services.i_service_series import ISeriesService
+from app.src.domain.useCases.use_case_series import UseCaseSeries
+from app.src.infrastructure.outputs.mysql.adapters.adapter_series import AdapterSeries
+from app.src.infrastructure.outputs.mysql.mappers.i_mapper_series_entity import IMapperSeriesEntity
+from app.src.infrastructure.outputs.mysql.repositories.i_series_repository import ISeriesRepository
+from app.src.infrastructure.outputs.mysql.repositories.implementation_series_repository import \
+    ImplementationSeriesRepository
 
 
-class ModuleInjectorMovie(Module):
-
-    @singleton
-    @provider
-    def providerIMovieRepository(self) -> IRepositoryMovie:
-        return ImplementationMovieRepository()
+class ModuleInjectorSeries(Module):
 
     @singleton
     @provider
-    def providerIPersistencePortMovie(self) -> IPersistenceMovie:
-        return AdapterMovie(
-            iRepositoryMovie=self.providerIMovieRepository(),
-            iMapperEntityMovie=IMapperEntityMovie()
+    def providerISeriesRepository(self) -> ISeriesRepository:
+        return ImplementationSeriesRepository()
+
+    @singleton
+    @provider
+    def providerIPersistencePortSeries(self) -> ISeriesPersistence:
+        return AdapterSeries(
+            iSeriesEntity=self.providerISeriesRepository(),
+            iMapperSeriesEntity=IMapperSeriesEntity()
         )
 
     @singleton
     @provider
-    def providerIServicePortMovie(self) -> IServiceMovie:
-        return UseCaseMovie(iPersistenceMovie=self.providerIPersistencePortMovie())
+    def providerIServicePortSeries(self) -> ISeriesService:
+        return UseCaseSeries(iSeriesPersistence=self.providerIPersistencePortSeries())
 
     @singleton
     @provider
-    def providerIHandlerMovie(self) -> IHandlerMovie:
-        return ImplementationHandlerMovie(
-            iMapperHandler=IMapperHandler(),
-            iServiceMovie=self.providerIServicePortMovie()
+    def providerIHandlerSeries(self) -> IHandlerSeries:
+        return ImplementationHandlerSeries(
+            iSeriesService=self.providerIServicePortSeries(),
+            iMapperSeriesApplication=IMapperSeriesApplication()
         )

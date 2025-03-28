@@ -4,9 +4,9 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from app.src.application.utils.utils_file_application import UtilsFilesApplication
 from app.src.infrastructure.outputs.mysql.entities.series_entity import SeriesEntity
 from app.src.infrastructure.outputs.mysql.settings.database_config import DatabaseConfiguration
-from app.src.infrastructure.outputs.mysql.repositories.i_series_entity import ISeriesEntity
+from app.src.infrastructure.outputs.mysql.repositories.i_series_repository import ISeriesRepository
 
-class ImplementationSEriesEntity(ISeriesEntity):
+class ImplementationSeriesRepository(ISeriesRepository):
 
     async def getAll(self, page: int, limit: int) -> list[SeriesEntity]:
         async with DatabaseConfiguration.getSession() as session:
@@ -28,10 +28,11 @@ class ImplementationSEriesEntity(ISeriesEntity):
     async def create(self, series: SeriesEntity) -> SeriesEntity:
         async with DatabaseConfiguration.getSession() as session:
             try:
-                series.imgUrl = "files/series/id"
+                series.imgUrl = "files/series/"
                 session.add(series)
                 await session.commit()
                 await session.refresh(series)
+                series.imgUrl = f"files/series/{series.id}"
                 return series
             except IntegrityError as error:
                 await session.rollback()
@@ -58,6 +59,24 @@ class ImplementationSEriesEntity(ISeriesEntity):
                 await session.commit()
                 await session.refresh(result)
                 return result
+            except IntegrityError as error:
+                await session.rollback()
+                raise ValueError(f"{error}")
+            except SQLAlchemyError as error:
+                await session.rollback()
+                raise RuntimeError(f"{error}")
+
+    async def updateByIdTheImgUrl(self, imgUrl: str, id: str) -> str:
+        async with DatabaseConfiguration.getSession() as session:
+            try:
+                result: SeriesEntity | None = await session.get(SeriesEntity, id)
+                if result is None:
+                    raise ValueError(f"la serie no fue encontrada por el id: {id}")
+
+                result.imgUrl = imgUrl
+                await session.commit()
+                await session.refresh(result)
+                return f"Se actualizo la imagen de la serie con el id: {id}"
             except IntegrityError as error:
                 await session.rollback()
                 raise ValueError(f"{error}")

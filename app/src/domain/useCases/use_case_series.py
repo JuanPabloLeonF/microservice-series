@@ -19,6 +19,8 @@ class UseCaseSeries(ISeriesService):
     async def updateById(self, id: str, seriesUpdate: SeriesModel) -> SeriesModel:
         return await self.iSeriesPersistence.updateById(id=id, seriesUpdate=seriesUpdate)
 
+    async def updateByIdTheImgUrl(self, imgUrl: str, id: str) -> str:
+        return await self.iSeriesPersistence.updateByIdTheImgUrl(imgUrl=imgUrl, id=id)
 
     async def deleteById(self, id: str) -> str:
         return await self.iSeriesPersistence.deleteById(id=id)

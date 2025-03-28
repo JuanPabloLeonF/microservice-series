@@ -1,8 +1,8 @@
 from starlette.routing import BaseRoute
 
-from app.src.infrastructure.inputs.rest.controllers.movie_controller import movieRouter
+from app.src.infrastructure.inputs.rest.controllers.controller_series import seriesRouter
 class ConfigurationRouter:
 
     @staticmethod
     def registerRouters() -> list[BaseRoute]:
-        return list(movieRouter.routes)
+        return list(seriesRouter.routes)
