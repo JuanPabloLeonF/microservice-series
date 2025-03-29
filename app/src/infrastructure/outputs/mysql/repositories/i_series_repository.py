@@ -8,7 +8,7 @@ class ISeriesRepository(ABC):
         pass
 
     @abstractmethod
-    async def getById(self, id:str) -> SeriesEntity:
+    async def getById(self, id: str) -> SeriesEntity:
         pass
 
     @abstractmethod

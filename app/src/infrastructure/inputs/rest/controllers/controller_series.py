@@ -2,7 +2,7 @@ import injector
 from fastapi import APIRouter,status, Depends
 from fastapi.responses import JSONResponse
 
-from app.configuration.module_injector_user import ModuleInjectorSeries
+from app.configuration.module_injector_series import ModuleInjectorSeries
 from app.src.application.dto.request_series import RequestSeries
 from app.src.application.dto.response_series import ResponseSeries
 from app.src.application.handlers.i_handler_series import IHandlerSeries
